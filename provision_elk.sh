@@ -28,20 +28,39 @@ systemctl enable elasticsearch.service --now
 passelastic=$(sudo /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic -b -s)
 passkibana=$(sudo /usr/share/elasticsearch/bin/elasticsearch-reset-password -u kibana_system -b -s)
 
-echo $passelastic >> /prueba.txt
-echo $passkibana >> /prueba2.txt
+echo $passelastic >> /elastic.txt
+echo $passkibana >> /kibana.txt
 
 #Instalacion Kibana
+
 mkdir -p /etc/kibana/certs
 cp /etc/elasticsearch/certs/http_ca.crt /etc/kibana/certs/
-apt-get update && apt-get install kibana
-echo "server.port: 5601" >> /etc/kibana/kibana.yml
-echo "server.host: \"192.168.56.11\"" >> /etc/kibana/kibana.yml
-echo "elasticsearch.hosts: ["https://localhost:9200"]" >> /etc/kibana/kibana.yml
-echo "elasticsearch.username: \"kibana_system\"" >> /etc/kibana/kibana.yml 
-echo "elasticsearch.password: $passkibana" >> /etc/kibana/kibana.yml
-echo "elasticsearch.ssl.certificateAuthorities: [ "/etc/kibana/certs/http_ca.crt" ]" >> /etc/kibana/kibana.yml
+IP_Kibana=$(ip addr show | grep 'inet ' | grep -v '127.0.0.1' | awk '{print $2}' | head -1 | cut -d '/' -f1)
 
+apt-get update && apt-get install kibana
+
+cat > /etc/kibana/kibana.yml << EOF
+server.port: 5601
+server.host: "$IP_Kibana"
+elasticsearch.hosts: ["https://localhost:9200"]
+elasticsearch.username: "kibana_system" 
+elasticsearch.password: $passkibana
+elasticsearch.ssl.certificateAuthorities: [ "/etc/kibana/certs/http_ca.crt" ]
+
+logging:
+  appenders:
+    file:
+      type: file
+      fileName: /var/log/kibana/kibana.log
+      layout:
+        type: json
+  root:
+    appenders:
+      - default
+      - file
+
+pid.file: /run/kibana/kibana.pid
+EOF
 
 
 #Instalacion Logstash
