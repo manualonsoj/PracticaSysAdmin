@@ -12,8 +12,8 @@ Vagrant.configure("2") do |config|
     server1.vm.network "private_network", ip: "192.168.56.10", nic_type: "virtio", virtualbox__intnet: "keepcooding"
     server1.vm.provider "virtualbox" do |vb|
       vb.name = "server1"
-	    vb.memory = "2048"
-      vb.cpus = "1"
+	    vb.memory = "4096"
+      vb.cpus = "2"
 	    vb.default_nic_type = "virtio"
       file_to_disk1 = "extradisk1.vmdk"
       unless File.exist?(file_to_disk1)
@@ -28,7 +28,7 @@ Vagrant.configure("2") do |config|
     server2.vm.box = BOX_IMAGE
     server2.vm.box_check_update = false
     server2.vm.hostname = "server2"
-    server2.vm.network "forwarded_port", guest: 5601, host: 8056
+    server2.vm.network "forwarded_port", guest: 5601, host: 5601
     server2.vm.network "forwarded_port", guest: 9200, host: 9200 
     server2.vm.network "private_network", ip: "192.168.56.11", nic_type: "virtio", virtualbox__intnet: "keepcooding"
     server2.vm.provider "virtualbox" do |vb|

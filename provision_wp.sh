@@ -42,6 +42,10 @@ mysql -uroot -e "CREATE DATABASE wordpress DEFAULT CHARACTER SET utf8 COLLATE ut
 mysql -uroot -e "GRANT ALL ON wordpress.* TO 'wordpressuser'@'localhost' IDENTIFIED BY 'keepcoding';"
 mysql -uroot -e "FLUSH privileges;"
 
+mysql -uroot -e "CREATE DATABASE wordpress DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+mysql -uroot -e "GRANT ALL ON wordpress.* TO 'wordpressuser'@'localhost' IDENTIFIED BY 'keepcoding';"
+mysql -uroot -e  "FLUSH PRIVILEGES;"
+
 
 #Securizar MySQL
 mysql_secure_installation << EOF
@@ -58,9 +62,6 @@ EOF
 mysql -uroot -e "update mysql.user set plugin='' where User='root';"
 mysql -uroot -e "FLUSH privileges;"
 
-#wp-config
-#sed '23,29 d' </var/www/wordpress/wp-config-sample.php >/var/www/wordpress/wp-config.php && sed '23 a define( "DB_NAME", "wordpress" );' -i /var/www/wordpress/wp-config.php && sed '24 a / Database username */' -i /var/www/wordpress/wp-config.php && sed '25 a define( "DB_USER", "wordpressuser" );' -i /var/www/wordpress/wp-config.php && sed '26 a / Database password */' -i /var/www/wordpress/wp-config.php && sed '27 a define( "DB_PASSWORD", "keepcoding" );' -i /var/www/wordpress/wp-config.php
-
 
 #Desplieegue Wordpress
 wget https://wordpress.org/latest.tar.gz >/dev/null 2>&1
@@ -68,16 +69,19 @@ tar -xf latest.tar.gz -C /var/www/
 chown -R www-data:www-data /var/www/wordpress/
 chmod -R 755 /var/www/wordpress/
 
-#wp-config
-sed '23,29 d' </var/www/wordpress/wp-config-sample.php >/var/www/wordpress/wp-config.php && sed '23 a define( "DB_NAME", "wordpress" );' -i /var/www/wordpress/wp-config.php && sed '24 a / Database username */' -i /var/www/wordpress/wp-config.php && sed '25 a define( "DB_USER", "wordpressuser" );' -i /var/www/wordpress/wp-config.php && sed '26 a / Database password */' -i /var/www/wordpress/wp-config.php && sed '27 a define( "DB_PASSWORD", "keepcoding" );' -i /var/www/wordpress/wp-config.php
 
 #Configurar Nginx para Wordpress
 ln -s /etc/nginx/sites-available/wordpress /etc/nginx/sites-enabled/wordpress
 rm -rf /etc/nginx/sites-available/default
 rm -rf /etc/nginx/sites-enabled/default
+
+sed -e "s/database_name_here/wordpress/" \
+    -e "s/username_here/wordpressuser/" \
+    -e "s/password_here/keepcoding/" \
+    -e "s/put your unique phrase here/keepcoding wordpress/" \
+    /var/www/wordpress/wp-config-sample.php > /var/www/wordpress/wp-config.php
+
 systemctl restart nginx
-
-
 
 
 
