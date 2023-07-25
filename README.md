@@ -16,7 +16,7 @@ Esto levantara las maquinas server1 y server2:
 
 Para acceder a los logs tendremos que entrar en la web http://localhost:5601
         usuario:elastic
-        pass: entrar a la maquina y revisar fichero /elastic.txt para revisar pass generado durante la instalacion
+        pass: entrar a la maquina y revisar fichero /elastic.txt para revisar pass generado durante la instalacion.
 ![Imagen kibana]()
 
 Una vez logueados podremos generar un data view de Filebeat donde se podran ver los logs.
